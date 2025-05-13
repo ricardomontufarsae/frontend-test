@@ -1,0 +1,110 @@
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Gestión de Productos</h3>
+        <div>
+            <button class="btn btn-success mr-2" ng-click="abrirNuevo()">Nuevo</button>
+            <button class="btn btn-outline-primary mr-2" ng-click="exportarExcel()">Exportar a Excel</button>
+            <button class="btn btn-outline-secondary" ng-click="imprimir()">Imprimir</button>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <input type="text" class="form-control" placeholder="Buscar producto..." ng-model="filtroBusqueda">
+        </div>
+    </div>
+
+    <table id="tablaProductos" class="table table-bordered table-striped">
+        <thead class="thead-dark">
+        <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Código</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="producto in productos | filter:filtroBusqueda | limitTo: itemsPorPagina : (paginaActual - 1) * itemsPorPagina">
+            <td>{{ producto.nombre }}</td>
+            <td>{{ producto.descripcion }}</td>
+            <td>{{ producto.precio }}</td>
+            <td>{{ producto.stock }}</td>
+            <td>{{ producto.codigo }}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" ng-click="editarProducto(producto)">Editar</button>
+                <button class="btn btn-sm btn-danger" ng-click="eliminarProducto(producto.id)">Eliminar</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+
+    <nav>
+        <ul class="pagination">
+            <li class="page-item" ng-class="{disabled: paginaActual == 1}">
+                <a class="page-link" href="" ng-click="paginaAnterior()">Anterior</a>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">Página {{paginaActual}}</span>
+            </li>
+            <li class="page-item" ng-class="{disabled: productos.length <= paginaActual * itemsPorPagina}">
+                <a class="page-link" href="" ng-click="paginaSiguiente()">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+
+</div>
+
+
+<!-- Modal para crear/editar producto -->
+<div class="modal fade" id="editarProductoModal" tabindex="-1" role="dialog" aria-labelledby="editarProductoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="editarProductoModalLabel">
+                    {{ productoSeleccionado.id ? 'Editar Producto' : 'Nuevo Producto' }}
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form name="formProducto">
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" class="form-control" ng-model="productoSeleccionado.nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <textarea class="form-control" ng-model="productoSeleccionado.descripcion" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Precio</label>
+                        <input type="text" class="form-control" ng-model="productoSeleccionado.precio" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Stock</label>
+                        <input type="text" class="form-control" ng-model="productoSeleccionado.stock" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Código</label>
+                        <input type="text" class="form-control" ng-model="productoSeleccionado.codigo" required>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" ng-click="guardarCambios()">
+                    {{ productoSeleccionado.id ? 'Guardar Cambios' : 'Crear Producto' }}
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

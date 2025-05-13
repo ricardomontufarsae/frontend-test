@@ -1,0 +1,104 @@
+app.controller('ProductoController', function($scope, ProductoService) {
+    $scope.productos = [];
+    $scope.productoSeleccionado = {};
+
+    function cargarProductos() {
+        ProductoService.obtenerProductos().then(function(response) {
+            $scope.productos = response.data;
+        });
+    }
+
+    cargarProductos();
+
+    $scope.editarProducto = function(producto) {
+        $scope.productoSeleccionado = angular.copy(producto);
+        $('#editarProductoModal').modal('show');
+    };
+
+    $scope.guardarCambios = function() {
+        if($scope.productoSeleccionado.id){
+
+            var id = $scope.productoSeleccionado.id;
+
+            ProductoService.actualizarProducto(id, $scope.productoSeleccionado).then(function(response) {
+                alert(response.data.message);
+                $('#editarProductoModal').modal('hide');
+                cargarProductos();
+            }, function(error) {
+                console.error('Error al actualizar:', error);
+                alert('Error al guardar los cambios');
+            });
+        } else {
+            ProductoService.crearProducto($scope.productoSeleccionado).then(function(response) {
+                alert(response.data.message);
+                $('#editarProductoModal').modal('hide');
+                cargarProductos();
+            });
+        }
+    };
+
+    $scope.eliminarProducto = function(id) {
+        if (confirm('¿Estás seguro de eliminar este producto?')) {
+            ProductoService.eliminarProducto(id).then(function(response) {
+                alert(response.data.message);
+                cargarProductos();
+            });
+        }
+    };
+
+    $scope.filtroBusqueda = '';
+    $scope.paginaActual = 1;
+    $scope.itemsPorPagina = 5;
+
+    $scope.paginaAnterior = function() {
+        if ($scope.paginaActual > 1) {
+            $scope.paginaActual--;
+        }
+    };
+
+    $scope.paginaSiguiente = function() {
+        if (($scope.paginaActual * $scope.itemsPorPagina) < $scope.productos.length) {
+            $scope.paginaActual++;
+        }
+    };
+
+    $scope.imprimir = function () {
+        var contenido = document.getElementById('tablaProductos').outerHTML;
+
+        var ventana = window.open('', '', 'height=700,width=900');
+        ventana.document.write('<html><head><title>Imprimir Productos</title>');
+        ventana.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">');
+        ventana.document.write('</head><body>');
+        ventana.document.write('<h3 class="text-center mt-3 mb-4">Listado de Productos</h3>');
+        ventana.document.write(contenido);
+        ventana.document.write('</body></html>');
+
+        ventana.document.close();
+        ventana.focus();
+        ventana.print();
+        ventana.close();
+    };
+
+
+    $scope.exportarExcel = function () {
+        const datos = $scope.productos.map(p => ({
+            Nombre: p.nombre,
+            Descripción: p.descripcion,
+            Precio: p.precio,
+            Stock: p.stock,
+            Código: p.codigo
+        }));
+
+        const hoja = XLSX.utils.json_to_sheet(datos);
+        const libro = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(libro, hoja, "Productos");
+        XLSX.writeFile(libro, "productos.xlsx");
+    };
+
+
+    $scope.abrirNuevo = function () {
+        $scope.productoSeleccionado = {};
+        $('#editarProductoModal').modal('show');
+    };
+
+});
