@@ -1,4 +1,4 @@
-app.controller('ProductoController', function($scope, ProductoService, CategoriaService) {
+app.controller('ProductoController', function($scope, $filter, ProductoService, CategoriaService) {
     $scope.productos = [];
     $scope.productoSeleccionado = {};
     $scope.categorias = {};
@@ -58,6 +58,20 @@ app.controller('ProductoController', function($scope, ProductoService, Categoria
     $scope.filtroBusqueda = '';
     $scope.paginaActual = 1;
     $scope.itemsPorPagina = 5;
+    $scope.productosFiltrados = [];
+    $scope.productosPaginados = [];
+
+    $scope.$watchGroup(['productos', 'filtroBusqueda', 'paginaActual'], function () {
+        let filtrados = $filter('filter')($scope.productos, $scope.filtroBusqueda);
+
+        $scope.productosFiltrados = filtrados;
+
+        let inicio = ($scope.paginaActual - 1) * $scope.itemsPorPagina;
+        let fin = inicio + $scope.itemsPorPagina;
+
+        $scope.productosPaginados = filtrados.slice(inicio, fin);
+    });
+
 
     $scope.paginaAnterior = function() {
         if ($scope.paginaActual > 1) {
@@ -66,10 +80,17 @@ app.controller('ProductoController', function($scope, ProductoService, Categoria
     };
 
     $scope.paginaSiguiente = function() {
-        if (($scope.paginaActual * $scope.itemsPorPagina) < $scope.productos.length) {
+        if ($scope.paginaActual < $scope.totalPaginas()) {
             $scope.paginaActual++;
         }
     };
+
+    $scope.totalPaginas = function() {
+        if (!$scope.productosFiltrados) return 1;
+        return Math.ceil($scope.productosFiltrados.length / $scope.itemsPorPagina);
+    };
+
+
 
     $scope.imprimir = function () {
         var contenido = document.getElementById('tablaProductos').outerHTML;

@@ -46,7 +46,7 @@ app.config(['$routeProvider', '$httpProvider', function($routeProvider, $httpPro
         })
         .when('/reportes', {
             templateUrl: 'views/reportes.html',
-            controller: 'ReportesController',
+            controller: 'ReporteController',
             resolve: {
                 auth: function(AuthService, $location) {
                     if (!AuthService.isAuthenticated()) {

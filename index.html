@@ -28,11 +28,12 @@
     <script src="controllers/ProductoController.js"></script>
     <script src="controllers/NavbarController.js"></script>
     <script src="controllers/CategoriaController.js"></script>
+    <script src="controllers/ReporteController.js"></script>
 </head>
 <body ng-controller="NavbarController">
 
-<nav class="navbar navbar-dark bg-dark">
-    <div class="ml-auto" ng-controller="NavbarController">
+<nav class="navbar navbar-dark bg-dark fixed-top">
+    <div class="ml-auto">
         <div ng-if="!isLoggedIn()">
             <a href="#/login" class="btn btn-outline-light btn-sm mr-2">Login</a>
             <a href="#/register" class="btn btn-outline-light btn-sm">Registro</a>
@@ -45,9 +46,9 @@
 
 </nav>
 
-<div class="container-fluid">
+<div class="container-fluid ">
     <div class="row">
-        <div class="col-md-2 bg-dark sidebar py-4" ng-if="isLoggedIn()" style="height: 100vh;">
+        <div class="sidebar py-4" ng-if="isLoggedIn()">
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link text-white" href="#/dashboard">Dashboard</a>
@@ -64,7 +65,8 @@
             </ul>
         </div>
 
-        <div class="col-md-8 py-2" ng-class="{'offset-md-1': isLoggedIn()}">
+
+        <div class="main-content" ng-class="{'offset-md-1': isLoggedIn()}">
             <div ng-view></div>
         </div>
 
@@ -75,6 +77,32 @@
 
 </html>
 <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding-top: 40px;
+    }
+
+    .container-fluid, .row {
+        height: 100%;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 40px;
+        left: 0;
+        width: 200px;
+        height: calc(100% - 40px);
+        background-color: #343a40;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+
+    .main-content {
+        margin-left: 200px;
+        padding: 20px;
+    }
+
     .sidebar .nav-link:hover {
         background-color: rgba(255, 255, 255, 0.1);
     }
