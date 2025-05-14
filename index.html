@@ -64,12 +64,10 @@
                 </li>
             </ul>
         </div>
+    </div>
 
-
-        <div class="main-content" ng-class="{'offset-md-1': isLoggedIn()}">
-            <div ng-view></div>
-        </div>
-
+    <div class="main-content" >
+        <div ng-view></div>
     </div>
 </div>
 
@@ -83,9 +81,7 @@
         padding-top: 40px;
     }
 
-    .container-fluid, .row {
-        height: 100%;
-    }
+
 
     .sidebar {
         position: fixed;

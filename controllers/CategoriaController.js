@@ -1,4 +1,4 @@
-app.controller('CategoriaController', function($scope, CategoriaService) {
+app.controller('CategoriaController', function($scope, $filter, CategoriaService) {
     $scope.categorias = [];
     $scope.categoriaSeleccionado = {};
 
@@ -49,6 +49,19 @@ app.controller('CategoriaController', function($scope, CategoriaService) {
     $scope.filtroBusqueda = '';
     $scope.paginaActual = 1;
     $scope.itemsPorPagina = 5;
+    $scope.categoriasFiltrados = [];
+    $scope.categoriasPaginados = [];
+
+    $scope.$watchGroup(['categorias', 'filtroBusqueda', 'paginaActual'], function () {
+        let filtrados = $filter('filter')($scope.categorias, $scope.filtroBusqueda);
+
+        $scope.categoriasFiltrados = filtrados;
+
+        let inicio = ($scope.paginaActual - 1) * $scope.itemsPorPagina;
+        let fin = inicio + $scope.itemsPorPagina;
+
+        $scope.categoriasPaginados = filtrados.slice(inicio, fin);
+    });
 
     $scope.paginaAnterior = function() {
         if ($scope.paginaActual > 1) {
@@ -57,9 +70,14 @@ app.controller('CategoriaController', function($scope, CategoriaService) {
     };
 
     $scope.paginaSiguiente = function() {
-        if (($scope.paginaActual * $scope.itemsPorPagina) < $scope.categorias.length) {
+        if ($scope.paginaActual < $scope.totalPaginas()) {
             $scope.paginaActual++;
         }
+    };
+
+    $scope.totalPaginas = function() {
+        if (!$scope.categoriasFiltrados) return 1;
+        return Math.ceil($scope.categoriasFiltrados.length / $scope.itemsPorPagina);
     };
 
     $scope.imprimir = function () {
