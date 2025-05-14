@@ -1,6 +1,15 @@
-app.controller('ProductoController', function($scope, ProductoService) {
+app.controller('ProductoController', function($scope, ProductoService, CategoriaService) {
     $scope.productos = [];
     $scope.productoSeleccionado = {};
+    $scope.categorias = {};
+
+    function cargarCategorias(){
+        CategoriaService.obtenerCategorias().then(function(response) {
+            $scope.categorias = response.data;
+        });
+    }
+
+    cargarCategorias();
 
     function cargarProductos() {
         ProductoService.obtenerProductos().then(function(response) {
@@ -86,7 +95,9 @@ app.controller('ProductoController', function($scope, ProductoService) {
             Descripción: p.descripcion,
             Precio: p.precio,
             Stock: p.stock,
-            Código: p.codigo
+            Código: p.codigo,
+            Fecha:p.fecha_ingreso,
+            Categoria: p.categoria.nombre
         }));
 
         const hoja = XLSX.utils.json_to_sheet(datos);

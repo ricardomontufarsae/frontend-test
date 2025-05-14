@@ -22,6 +22,17 @@ app.config(['$routeProvider', '$httpProvider', function($routeProvider, $httpPro
                 }
             }
         })
+        .when('/categorias', {
+            templateUrl: 'views/categorias.html',
+            controller: 'CategoriaController',
+            resolve: {
+                auth: function(AuthService, $location) {
+                    if (!AuthService.isAuthenticated()) {
+                        $location.path('/login');
+                    }
+                }
+            }
+        })
         .when('/dashboard', {
             templateUrl: 'views/dashboard.html',
             controller: 'DashboardController',

@@ -23,6 +23,8 @@
             <th>Precio</th>
             <th>Stock</th>
             <th>Código</th>
+            <th>Fecha de ingreso</th>
+            <th>Categoria</th>
             <th>Acciones</th>
         </tr>
         </thead>
@@ -30,9 +32,11 @@
         <tr ng-repeat="producto in productos | filter:filtroBusqueda | limitTo: itemsPorPagina : (paginaActual - 1) * itemsPorPagina">
             <td>{{ producto.nombre }}</td>
             <td>{{ producto.descripcion }}</td>
-            <td>{{ producto.precio }}</td>
+            <td>{{ producto.precio | currency }}</td>
             <td>{{ producto.stock }}</td>
             <td>{{ producto.codigo }}</td>
+            <td>{{ producto.fecha_ingreso | date }}</td>
+            <td>{{ producto.categoria.nombre }}</td>
             <td>
                 <button class="btn btn-sm btn-primary" ng-click="editarProducto(producto)">Editar</button>
                 <button class="btn btn-sm btn-danger" ng-click="eliminarProducto(producto.id)">Eliminar</button>
@@ -95,6 +99,17 @@
                         <label>Código</label>
                         <input type="text" class="form-control" ng-model="productoSeleccionado.codigo" required>
                     </div>
+                    <div class="form-group">
+                        <label>Fecha de ingreso</label>
+                        <input type="date" class="form-control" ng-model="productoSeleccionado.fecha_ingreso">
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select class="form-control" ng-model="productoSeleccionado.categoria_id" ng-options="c.id as c.nombre for c in categorias">
+                            <option value="">-- Selecciona una categoría --</option>
+                        </select>
+                    </div>
+
                 </form>
             </div>
 

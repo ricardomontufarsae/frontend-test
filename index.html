@@ -21,11 +21,13 @@
 
     <script src="services/authService.js"></script>
     <script src="services/productoService.js"></script>
+    <script src="services/categoriaService.js"></script>
 
     <script src="controllers/LoginController.js"></script>
     <script src="controllers/RegisterController.js"></script>
     <script src="controllers/ProductoController.js"></script>
     <script src="controllers/NavbarController.js"></script>
+    <script src="controllers/CategoriaController.js"></script>
 </head>
 <body ng-controller="NavbarController">
 
@@ -54,6 +56,9 @@
                     <a class="nav-link text-white" href="#/productos">Gestión de Productos</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link text-white" href="#/categorias">Gestión de Categorias</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link text-white" href="#/reportes">Reportes</a>
                 </li>
             </ul>
@@ -72,10 +77,5 @@
 <style>
     .sidebar .nav-link:hover {
         background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .sidebar .nav-link.active {
-        background-color: #007bff;
-        color: white !important;
     }
 </style>
