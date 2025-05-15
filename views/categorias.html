@@ -44,7 +44,7 @@
                 <a class="page-link" href="" ng-click="paginaAnterior()">Anterior</a>
             </li>
             <li class="page-item disabled">
-                <span class="page-link">Página {{paginaActual}}</span>
+                <span class="page-link">Página {{paginaActual}} de {{ totalPaginas() }}</span>
             </li>
             <li class="page-item" ng-class="{disabled: paginaActual == totalPaginas()}">
                 <a class="page-link" href="" ng-click="paginaSiguiente()">Siguiente</a>

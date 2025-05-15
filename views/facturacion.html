@@ -20,7 +20,8 @@
       <th>Emisor</th>
       <th>Receptor</th>
       <th>Valor de factura</th>
-      <th></th>
+      <th>Fecha</th>
+      <th>Acciones</th>
     </tr>
     </thead>
     <tbody>
@@ -29,6 +30,7 @@
       <td>{{ factura.emisor }}</td>
       <td>{{ factura.receptor }}</td>
       <td>{{ factura.monto_factura | currency}}</td>
+      <td>{{ factura.fecha_factura | date:'dd-MM-yyyy'}}</td>
       <td>
         <button class="btn btn-sm btn-primary" ng-click="editarFactura(factura)">Editar</button>
         <button class="btn btn-sm btn-danger" ng-click="eliminarFactura(factura._id)">Eliminar</button>
@@ -44,7 +46,7 @@
         <a class="page-link" href="" ng-click="paginaAnterior()">Anterior</a>
       </li>
       <li class="page-item disabled">
-        <span class="page-link">Página {{paginaActual}}</span>
+        <span class="page-link">Página {{paginaActual}} de {{ totalPaginas() }}</span>
       </li>
       <li class="page-item" ng-class="{disabled: paginaActual == totalPaginas()}">
         <a class="page-link" href="" ng-click="paginaSiguiente()">Siguiente</a>
@@ -103,7 +105,7 @@
                 <th width="15%" class="text-center">Cantidad</th>
                 <th width="15%" class="text-right">P. Unitario</th>
                 <th width="15%" class="text-right">Total</th>
-                <th width="15%" class="text-center">Acciones</th>
+                <th width="3%" class="text-center"></th>
               </tr>
               </thead>
               <tbody>
