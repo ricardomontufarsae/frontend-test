@@ -57,7 +57,7 @@ app.config(['$routeProvider', '$httpProvider', function($routeProvider, $httpPro
         })
         .when('/facturacion', {
             templateUrl: 'views/facturacion.html',
-            controller: 'FacturacionController',
+            controller: 'FacturaController',
             resolve: {
                 auth: function(AuthService, $location) {
                     if (!AuthService.isAuthenticated()) {

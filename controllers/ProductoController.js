@@ -13,6 +13,7 @@ app.controller('ProductoController', function($scope, $filter, ProductoService, 
 
     function cargarProductos() {
         ProductoService.obtenerProductos().then(function(response) {
+
             $scope.productos = response.data;
         });
     }

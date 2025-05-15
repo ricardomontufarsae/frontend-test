@@ -1,3 +1,167 @@
-<h2 class="mb-4">Facturacion</h2>
+<div >
+
+  <div class=" justify-content-between align-items-center mb-3">
+    <h3>Gestión de Facturas</h3>
+    <div>
+      <button class="btn btn-success mr-2" ng-click="abrirNuevo()">Nuevo</button>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <input type="text" class="form-control" placeholder="Buscar factura..." ng-model="filtroBusqueda">
+    </div>
+  </div>
+
+  <table class="table table-bordered table-striped">
+    <thead class="thead-dark">
+    <tr>
+      <th>Numero de factura</th>
+      <th>Emisor</th>
+      <th>Receptor</th>
+      <th>Valor de factura</th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="factura in facturasPaginados">
+      <td>{{ factura.numero_factura }}</td>
+      <td>{{ factura.emisor }}</td>
+      <td>{{ factura.receptor }}</td>
+      <td>{{ factura.monto_factura | currency}}</td>
+      <td>
+        <button class="btn btn-sm btn-primary" ng-click="editarFactura(factura)">Editar</button>
+        <button class="btn btn-sm btn-danger" ng-click="eliminarFactura(factura._id)">Eliminar</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
 
 
+  <nav>
+    <ul class="pagination">
+      <li class="page-item" ng-class="{disabled: paginaActual == 1}">
+        <a class="page-link" href="" ng-click="paginaAnterior()">Anterior</a>
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link">Página {{paginaActual}}</span>
+      </li>
+      <li class="page-item" ng-class="{disabled: paginaActual == totalPaginas()}">
+        <a class="page-link" href="" ng-click="paginaSiguiente()">Siguiente</a>
+      </li>
+    </ul>
+  </nav>
+
+</div>
+
+<div class="modal fade" id="editarFacturaModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content ">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fa fa-file-text-o"></i> {{ facturaSeleccionado._id ? 'Editar Factura' : 'Nueva Factura' }}
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="font-weight-bold">Emisor</label>
+                <input type="text" class="form-control" ng-model="facturaSeleccionado.emisor" required>
+              </div>
+              <div class="form-group">
+                <label class="font-weight-bold">Receptor</label>
+                <input type="text" class="form-control" ng-model="facturaSeleccionado.receptor" required>
+              </div>
+            </div>
+            <div class="col-md-6 text-right">
+              <div class="form-group">
+                <label class="font-weight-bold">Numero de Factura</label>
+                <input type="text" class="form-control text-right" ng-model="facturaSeleccionado.numero_factura" required>
+              </div>
+              <div class="form-group">
+                <label class="font-weight-bold">Fecha</label>
+                <input type="date" class="form-control text-right" ng-model="facturaSeleccionado.fecha_factura" required>
+              </div>
+            </div>
+          </div>
+
+        <hr >
+
+        <div >
+          <h5 class="section-title"><i class="fa fa-cubes"></i> Productos</h5>
+
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead class="thead-light">
+              <tr>
+                <th width="40%">Nombre</th>
+                <th width="15%" class="text-center">Cantidad</th>
+                <th width="15%" class="text-right">P. Unitario</th>
+                <th width="15%" class="text-right">Total</th>
+                <th width="15%" class="text-center">Acciones</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="p in facturaSeleccionado.productos">
+                <td>
+                  <select class="form-control" ng-model="p.producto_id"
+                          ng-options="prod._id as prod.nombre for prod in productosDisponibles" required>
+                    <option value="">Seleccione un producto</option>
+                  </select>
+                </td>
+                <td>
+                  <input type="number" class="form-control text-center" ng-model="p.cantidad" min="1" required>
+                </td>
+                <td>
+                  <input type="text" step="0.01" class="form-control text-right" ng-model="p.precio_unitario" min="0" required>
+                </td>
+                <td class="text-right">{{ p.cantidad * p.precio_unitario | currency }}</td>
+                <td class="text-center">
+                  <button class="btn btn-sm btn-outline-danger" ng-click="eliminarProducto(p)">
+                    X
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <button type="button" class="btn btn-outline-primary btn-sm" ng-click="agregarProducto()">
+            <i class="fa fa-plus"></i> Agregar Producto
+          </button>
+        </div>
+
+
+        <div>
+          <div class="row">
+            <div class="col-md-6 offset-md-6">
+              <div class="table-responsive">
+                <table class="table">
+
+                  <tr class="total-row">
+                    <th class="text-right">Total Factura:</th>
+                    <td class="text-right">{{ calcularTotal() | currency }}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-dismiss="modal">
+          <i class="fa fa-times"></i> Cancelar
+        </button>
+        <button class="btn btn-primary" ng-click="guardarCambios()" ng-disabled="formFactura.$invalid">
+          <i class="fa fa-save"></i> {{ facturaSeleccionado._id ? 'Guardar Cambios' : 'Generar Factura' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
