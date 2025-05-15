@@ -16,9 +16,9 @@ app.controller('CategoriaController', function($scope, $filter, CategoriaService
     };
 
     $scope.guardarCambios = function() {
-        if($scope.categoriaSeleccionado.id){
+        if($scope.categoriaSeleccionado._id){
 
-            var id = $scope.categoriaSeleccionado.id;
+            var id = $scope.categoriaSeleccionado._id;
 
             CategoriaService.actualizarCategorias(id, $scope.categoriaSeleccionado).then(function(response) {
                 alert(response.data.message);

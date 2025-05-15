@@ -25,10 +25,11 @@ app.controller('ProductoController', function($scope, $filter, ProductoService, 
     };
 
     $scope.guardarCambios = function() {
-        if($scope.productoSeleccionado.id){
+        if($scope.productoSeleccionado._id){
 
-            var id = $scope.productoSeleccionado.id;
+            var id = $scope.productoSeleccionado._id;
 
+            console.log($scope.productoSeleccionado);
             ProductoService.actualizarProducto(id, $scope.productoSeleccionado).then(function(response) {
                 alert(response.data.message);
                 $('#editarProductoModal').modal('hide');

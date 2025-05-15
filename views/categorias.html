@@ -31,7 +31,7 @@
             <td>{{ categoria.codigo }}</td>
             <td>
                 <button class="btn btn-sm btn-primary" ng-click="editarCategoria(categoria)">Editar</button>
-                <button class="btn btn-sm btn-danger" ng-click="eliminarCategoria(categoria.id)">Eliminar</button>
+                <button class="btn btn-sm btn-danger" ng-click="eliminarCategoria(categoria._id)">Eliminar</button>
             </td>
         </tr>
         </tbody>
@@ -62,7 +62,7 @@
 
             <div class="modal-header">
                 <h5 class="modal-title" id="editarCategoriaModalLabel">
-                    {{ categoriaSeleccionado.id ? 'Editar Categoria' : 'Nuevo Categoria' }}
+                    {{ categoriaSeleccionado._id ? 'Editar Categoria' : 'Nuevo Categoria' }}
                 </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
                     <span aria-hidden="true">&times;</span>
@@ -92,7 +92,7 @@
                         class="btn btn-primary"
                         ng-click="guardarCambios()"
                         ng-disabled="formCategoria.$invalid">
-                    {{ categoriaSeleccionado.id ? 'Guardar Cambios' : 'Crear Categoria' }}
+                    {{ categoriaSeleccionado._id ? 'Guardar Cambios' : 'Crear Categoria' }}
                 </button>
 
             </div>

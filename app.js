@@ -55,6 +55,17 @@ app.config(['$routeProvider', '$httpProvider', function($routeProvider, $httpPro
                 }
             }
         })
+        .when('/facturacion', {
+            templateUrl: 'views/facturacion.html',
+            controller: 'FacturacionController',
+            resolve: {
+                auth: function(AuthService, $location) {
+                    if (!AuthService.isAuthenticated()) {
+                        $location.path('/login');
+                    }
+                }
+            }
+        })
         .otherwise({ redirectTo: '/login' });
 
     // Interceptor para enviar token
