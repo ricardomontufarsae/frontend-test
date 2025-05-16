@@ -1,4 +1,4 @@
-app.controller('CategoriaController', function($scope, $filter, CategoriaService) {
+app.controller('CategoriaController', function($scope, $filter, $uibModal, CategoriaService, UtilService) {
     $scope.categorias = [];
     $scope.categoriaSeleccionado = {};
 
@@ -7,34 +7,42 @@ app.controller('CategoriaController', function($scope, $filter, CategoriaService
             $scope.categorias = response.data;
         });
     }
-
     cargarCategorias();
 
-    $scope.editarCategoria = function(categoria) {
-        $scope.categoriaSeleccionado = angular.copy(categoria);
-        $('#editarCategoriaModal').modal('show');
-    };
+    $scope.abrirModalCategoria = function(categoria) {
+        var modalInstance = $uibModal.open({
+            animation: false,
+            backdropClass: 'modal-backdrop-light',
+            templateUrl: 'views/modals/modal-generico.html',
+            controller: 'ModalGenericoController',
+            resolve: {
+                config: function() {
+                    return {
+                        titulo: categoria ? 'Editar categoria' : 'Nuevo Categoria',
+                        objeto: categoria || {
+                            nombre: '',
+                            descripcion: '',
+                            codigo: '',
+                        },
+                        campos: [
+                            { etiqueta: 'Nombre', modelo: 'nombre', tipo: 'text', required: true },
+                            { etiqueta: 'Descripción', modelo: 'descripcion', tipo: 'text' },
+                            { etiqueta: 'Código', modelo: 'codigo', tipo: 'text' }
+                        ]
+                    };
+                },
+            }
+        });
+        modalInstance.result.then(function(categoriaActualizado) {
+            if (categoria && categoria._id) {
+                CategoriaService.actualizarCategorias(categoria._id, categoriaActualizado)
+                    .then(cargarCategorias);
+            } else {
+                CategoriaService.crearCategorias(categoriaActualizado)
+                    .then(cargarCategorias);
+            }
+        });
 
-    $scope.guardarCambios = function() {
-        if($scope.categoriaSeleccionado._id){
-
-            var id = $scope.categoriaSeleccionado._id;
-
-            CategoriaService.actualizarCategorias(id, $scope.categoriaSeleccionado).then(function(response) {
-                alert(response.data.message);
-                $('#editarCategoriaModal').modal('hide');
-                cargarCategorias();
-            }, function(error) {
-                console.error('Error al actualizar:', error);
-                alert('Error al guardar los cambios');
-            });
-        } else {
-            CategoriaService.crearCategorias($scope.categoriaSeleccionado).then(function(response) {
-                alert(response.data.message);
-                $('#editarCategoriaModal').modal('hide');
-                cargarCategorias();
-            });
-        }
     };
 
     $scope.eliminarCategoria = function(id) {
@@ -81,22 +89,8 @@ app.controller('CategoriaController', function($scope, $filter, CategoriaService
     };
 
     $scope.imprimir = function () {
-        var contenido = document.getElementById('tablaCategorias').outerHTML;
-
-        var ventana = window.open('', '', 'height=700,width=900');
-        ventana.document.write('<html><head><title>Imprimir Categorias</title>');
-        ventana.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">');
-        ventana.document.write('</head><body>');
-        ventana.document.write('<h3 class="text-center mt-3 mb-4">Listado de Categorias</h3>');
-        ventana.document.write(contenido);
-        ventana.document.write('</body></html>');
-
-        ventana.document.close();
-        ventana.focus();
-        ventana.print();
-        ventana.close();
+        UtilService.imprimirTabla('tablaCategorias', 'Listado de categorias');
     };
-
 
     $scope.exportarExcel = function () {
         const datos = $scope.categorias.map(c => ({
@@ -104,17 +98,8 @@ app.controller('CategoriaController', function($scope, $filter, CategoriaService
             Descripción: c.descripcion,
             Código: c.codigo
         }));
-
-        const hoja = XLSX.utils.json_to_sheet(datos);
-        const libro = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(libro, hoja, "Categorias");
-        XLSX.writeFile(libro, "categorias.xlsx");
+        UtilService.exportarAExcel(datos, 'Categorias', 'Categorias');
     };
 
-
-    $scope.abrirNuevo = function () {
-        $scope.categoriaSeleccionado = {};
-        $('#editarCategoriaModal').modal('show');
-    };
 
 });

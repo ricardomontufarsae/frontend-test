@@ -1,4 +1,4 @@
-app.controller('ReporteController', function($scope, ProductoService, CategoriaService) {
+app.controller('ReportProductController', function($scope, ProductoService, CategoriaService, UtilService) {
     $scope.productos = [];
     $scope.categorias = [];
     $scope.filtroCategoria = '';
@@ -10,9 +10,7 @@ app.controller('ReporteController', function($scope, ProductoService, CategoriaS
             $scope.categorias = response.data.map(function(categoria) {
                 return categoria.nombre;
             });
-
         });
-
     }
 
     cargarCategorias();
@@ -45,22 +43,8 @@ app.controller('ReporteController', function($scope, ProductoService, CategoriaS
     };
 
     $scope.imprimir = function () {
-        var contenido = document.getElementById('tablaReportes').outerHTML;
-
-        var ventana = window.open('', '', 'height=700,width=900');
-        ventana.document.write('<html><head><title>Imprimir Reporte</title>');
-        ventana.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">');
-        ventana.document.write('</head><body>');
-        ventana.document.write('<h3 class="text-center mt-3 mb-4">Reporte</h3>');
-        ventana.document.write(contenido);
-        ventana.document.write('</body></html>');
-
-        ventana.document.close();
-        ventana.focus();
-        ventana.print();
-        ventana.close();
+        UtilService.imprimirTabla('tablaReportes', 'Reporte');
     };
-
 
     $scope.exportarExcel = function () {
         const datos = $scope.productos.map(p => ({
@@ -71,10 +55,6 @@ app.controller('ReporteController', function($scope, ProductoService, CategoriaS
             Fecha:p.fecha_ingreso,
             Categoria: p.categoria.nombre
         }));
-
-        const hoja = XLSX.utils.json_to_sheet(datos);
-        const libro = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(libro, hoja, "Reporte");
-        XLSX.writeFile(libro, "reporte.xlsx");
+        UtilService.exportarAExcel(datos, 'Reporte', 'reporte')
     };
 });

@@ -1,6 +1,16 @@
-var app = angular.module('testcrud', ['ngRoute']);
+var app = angular.module('testcrud', ['ngRoute', 'ui.bootstrap']);
 
 app.config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvider) {
+
+    function requireAuth(AuthService, $location) {
+        if (!AuthService.isAuthenticated()) {
+            $location.path('/login');
+        }
+    }
+
+    const authResolve = {
+        auth: ['AuthService', '$location', requireAuth]
+    };
 
     $routeProvider
         .when('/login', {
@@ -14,65 +24,40 @@ app.config(['$routeProvider', '$httpProvider', function($routeProvider, $httpPro
         .when('/productos', {
             templateUrl: 'views/productos.html',
             controller: 'ProductoController',
-            resolve: {
-                auth: function(AuthService, $location) {
-                    if (!AuthService.isAuthenticated()) {
-                        $location.path('/login');
-                    }
-                }
-            }
+            resolve: authResolve
         })
         .when('/categorias', {
             templateUrl: 'views/categorias.html',
             controller: 'CategoriaController',
-            resolve: {
-                auth: function(AuthService, $location) {
-                    if (!AuthService.isAuthenticated()) {
-                        $location.path('/login');
-                    }
-                }
-            }
+            resolve: authResolve
         })
         .when('/dashboard', {
             templateUrl: 'views/dashboard.html',
             controller: 'DashboardController',
-            resolve: {
-                auth: function(AuthService, $location) {
-                    if (!AuthService.isAuthenticated()) {
-                        $location.path('/login');
-                    }
-                }
-            }
-        })
-        .when('/reportes', {
-            templateUrl: 'views/reportes.html',
-            controller: 'ReporteController',
-            resolve: {
-                auth: function(AuthService, $location) {
-                    if (!AuthService.isAuthenticated()) {
-                        $location.path('/login');
-                    }
-                }
-            }
+            resolve: authResolve
         })
         .when('/facturacion', {
             templateUrl: 'views/facturacion.html',
             controller: 'FacturaController',
-            resolve: {
-                auth: function(AuthService, $location) {
-                    if (!AuthService.isAuthenticated()) {
-                        $location.path('/login');
-                    }
-                }
-            }
+            resolve: authResolve
+        })
+        .when('/reportes/productos', {
+            templateUrl: 'views/reportProduct.html',
+            controller: 'ReportProductController',
+            resolve: authResolve
+        })
+        .when('/reportes/facturas', {
+            templateUrl: 'views/reportInvoice.html',
+            controller: 'ReportInvoiceController',
+            resolve: authResolve
         })
         .otherwise({ redirectTo: '/login' });
 
-    // Interceptor para enviar token
+    // Interceptor para añadir token
     $httpProvider.interceptors.push(['AuthService', function(AuthService) {
         return {
             request: function(config) {
-                var token = AuthService.getToken();
+                const token = AuthService.getToken();
                 if (token) {
                     config.headers.Authorization = 'Bearer ' + token;
                 }

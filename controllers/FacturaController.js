@@ -1,4 +1,4 @@
-app.controller('FacturaController', function($scope, $filter, ProductoService, FacturaService) {
+app.controller('FacturaController', function($scope, $filter, $uibModal, ProductoService, FacturaService) {
     $scope.facturas = [];
     $scope.facturaSeleccionado = { productos: [] };
     $scope.productosDisponibles = [];
@@ -9,78 +9,17 @@ app.controller('FacturaController', function($scope, $filter, ProductoService, F
 
     function cargarProductos() {
         ProductoService.obtenerProductos().then(function(response) {
-            //console.log(response.data)
             $scope.productosDisponibles = response.data;
         });
     }
-
     cargarProductos();
 
     function cargarFacturas() {
         FacturaService.obtenerFacturas().then(function(response) {
-            //console.log(response.data)
             $scope.facturas = response.data;
         });
     }
-
     cargarFacturas();
-
-    $scope.agregarProducto = function () {
-        if (!$scope.facturaSeleccionado.productos) {
-            $scope.facturaSeleccionado.productos = [];
-        }
-        $scope.facturaSeleccionado.productos.push({
-            producto_id: '',
-            cantidad: 1,
-            precio_unitario: 0
-        });
-    };
-
-    $scope.eliminarProducto = function (producto) {
-        const index = $scope.facturaSeleccionado.productos.indexOf(producto);
-        if (index > -1) {
-            $scope.facturaSeleccionado.productos.splice(index, 1);
-        }
-    };
-
-    $scope.calcularTotal = function () {
-        if (!$scope.facturaSeleccionado.productos) return 0;
-
-        return $scope.facturaSeleccionado.productos.reduce((acc, p) => {
-            return acc + (p.cantidad * p.precio_unitario);
-        }, 0);
-    };
-
-    $scope.editarFactura = function(factura) {
-        $scope.facturaSeleccionado = angular.copy(factura);
-        $('#editarFacturaModal').modal('show');
-    };
-
-    $scope.guardarCambios = function() {
-        if($scope.facturaSeleccionado._id){
-
-            var id = $scope.facturaSeleccionado._id;
-
-            console.log($scope.facturaSeleccionado);
-            FacturaService.actualizarFactura(id, $scope.facturaSeleccionado).then(function(response) {
-                alert(response.data.message);
-                $('#editarFacturaModal').modal('hide');
-                cargarFacturas();
-                cargarProductos();
-            }, function(error) {
-                console.error('Error al actualizar:', error);
-                alert('Error al guardar los cambios');
-            });
-        } else {
-            console.log($scope.facturaSeleccionado);
-            FacturaService.crearFactura($scope.facturaSeleccionado).then(function(response) {
-                alert(response.data.message);
-                $('#editarFacturaModal').modal('hide');
-                cargarFacturas();
-                cargarProductos();
-            });
-        }
-    };
 
     $scope.eliminarFactura = function(id) {
         if (confirm('¿Estás seguro de eliminar esta factura?')) {
@@ -100,7 +39,6 @@ app.controller('FacturaController', function($scope, $filter, ProductoService, F
 
     $scope.$watchGroup(['facturas', 'filtroBusqueda', 'paginaActual'], function () {
         let filtrados = $filter('filter')($scope.facturas, $scope.filtroBusqueda);
-
         $scope.facturasFiltrados = filtrados;
 
         let inicio = ($scope.paginaActual - 1) * $scope.itemsPorPagina;
@@ -108,7 +46,6 @@ app.controller('FacturaController', function($scope, $filter, ProductoService, F
 
         $scope.facturasPaginados = filtrados.slice(inicio, fin);
     });
-
 
     $scope.paginaAnterior = function() {
         if ($scope.paginaActual > 1) {
@@ -127,14 +64,53 @@ app.controller('FacturaController', function($scope, $filter, ProductoService, F
         return Math.ceil($scope.facturasFiltrados.length / $scope.itemsPorPagina);
     };
 
-    $scope.abrirNuevo = function () {
-        $scope.facturaSeleccionado = {
-            productos: [],
-            fecha_factura: new Date(),
-            emisor: $scope.getNombre()
-        };
-        $('#editarFacturaModal').modal('show');
+    $scope.abrirModalFactura = function(factura) {
+        console.log(factura);
+
+        if (factura && factura.fecha_factura) {
+            factura.fecha_factura = new Date(factura.fecha_factura);
+        }
+
+        ProductoService.obtenerProductos().then(function(res) {
+            var modalInstance = $uibModal.open({
+                backdropClass: 'modal-backdrop-light',
+                animation: false,
+                size: 'lg',
+                backdrop: 'static',
+                templateUrl: 'views/modals/modal-factura.html',
+                controller: 'ModalFacturaController',
+                resolve: {
+                    factura: function() {
+                        return factura ? angular.copy(factura) : {
+                            emisor: '',
+                            receptor: '',
+                            numero_factura: '',
+                            fecha_factura: new Date(),
+                            productos: []
+                        };
+                    },
+                    productosDisponibles: function() {
+                        return res.data;
+                    },
+                    soloLectura: function () {
+                        return false;
+                    }
+                }
+            });
+
+            modalInstance.result.then(function(facturaGuardada) {
+                if (facturaGuardada._id) {
+                    FacturaService.actualizarFactura(facturaGuardada._id, facturaGuardada).then(() => {
+                        cargarFacturas();
+                        cargarProductos();
+                    });
+                } else {
+                    FacturaService.crearFactura(facturaGuardada).then(() => {
+                        cargarFacturas();
+                        cargarProductos();
+                    });
+                }
+            });
+        });
     };
-
-
 });

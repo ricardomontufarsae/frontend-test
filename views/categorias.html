@@ -1,9 +1,8 @@
 <div >
-
     <div class=" justify-content-between align-items-center mb-3">
         <h3>Gestión de Categorias</h3>
         <div>
-            <button class="btn btn-success mr-2" ng-click="abrirNuevo()">Nuevo</button>
+            <button class="btn btn-success mr-2" ng-click="abrirModalCategoria(null)">Nuevo</button>
             <button class="btn btn-outline-primary mr-2" ng-click="exportarExcel()">Exportar a Excel</button>
             <button class="btn btn-outline-secondary" ng-click="imprimir()">Imprimir</button>
         </div>
@@ -30,13 +29,12 @@
             <td>{{ categoria.descripcion }}</td>
             <td>{{ categoria.codigo }}</td>
             <td>
-                <button class="btn btn-sm btn-primary" ng-click="editarCategoria(categoria)">Editar</button>
+                <button class="btn btn-sm btn-primary" ng-click="abrirModalCategoria(categoria)">Editar</button>
                 <button class="btn btn-sm btn-danger" ng-click="eliminarCategoria(categoria._id)">Eliminar</button>
             </td>
         </tr>
         </tbody>
     </table>
-
 
     <nav>
         <ul class="pagination">
@@ -52,51 +50,4 @@
         </ul>
     </nav>
 
-</div>
-
-
-<!-- Modal para crear/editar categoria -->
-<div class="modal fade" id="editarCategoriaModal" tabindex="-1" role="dialog" aria-labelledby="editarCategoriaModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title" id="editarCategoriaModalLabel">
-                    {{ categoriaSeleccionado._id ? 'Editar Categoria' : 'Nuevo Categoria' }}
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <form name="formCategoria">
-                    <div class="form-group">
-                        <label>Nombre *</label>
-                        <input type="text" class="form-control" ng-model="categoriaSeleccionado.nombre" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Descripción *</label>
-                        <textarea class="form-control" ng-model="categoriaSeleccionado.descripcion" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Código *</label>
-                        <input type="text" class="form-control" ng-model="categoriaSeleccionado.codigo" required>
-                    </div>
-                </form>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                <button type="button"
-                        class="btn btn-primary"
-                        ng-click="guardarCambios()"
-                        ng-disabled="formCategoria.$invalid">
-                    {{ categoriaSeleccionado._id ? 'Guardar Cambios' : 'Crear Categoria' }}
-                </button>
-
-            </div>
-
-        </div>
-    </div>
 </div>

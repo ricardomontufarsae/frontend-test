@@ -1,0 +1,36 @@
+<div>
+    <div class=" justify-content-between align-items-center mb-3">
+        <h3>Reporte de Facturas </h3>
+        <div>
+            <button class="btn btn-outline-primary mr-2" ng-click="exportarExcel()">Exportar a Excel</button>
+            <button class="btn btn-outline-secondary" ng-click="imprimir()">Imprimir</button>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <input type="text" class="form-control" placeholder="Buscar producto..." ng-model="filtroBusqueda">
+        </div>
+    </div>
+    <table id="tablaReportInvoice"  class="table table-bordered table-striped">
+        <thead class="thead-dark">
+        <tr>
+            <th>Nombre del Producto</th>
+            <th>Número de Factura</th>
+            <th>Fecha de Factura</th>
+            <th>Precio Total</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="item in productosFacturados | filter:filtroBusqueda">
+            <td>{{ item.nombre }}</td>
+            <td>{{ item.numero_factura }}</td>
+            <td>{{ item.fecha_factura | date:'yyyy-MM-dd' }}</td>
+            <td>${{ item.precio_total | number:2 }}</td>
+            <td>
+                <button class="btn btn-sm btn-info" ng-click="verFactura(item.numero_factura)">Ver</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

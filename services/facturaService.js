@@ -13,6 +13,12 @@ app.factory('FacturaService', function($http) {
         },
         actualizarFactura: function(id, data) {
             return $http.put(baseUrl + '/' + id, data);
+        },
+        getProductosFacturados: function() {
+            return $http.get(baseUrl);
+        },
+        getFacturaNumFac: function(numFac) {
+            return $http.get(baseUrl + '/numfac/' + encodeURIComponent(numFac));
         }
 
     };
