@@ -3,7 +3,6 @@ app.controller('ModalFacturaController', function($scope, $uibModalInstance, fac
     $scope.productosDisponibles = productosDisponibles;
     $scope.soloLectura = soloLectura;
 
-
     $scope.agregarProducto = function () {
         $scope.factura.productos.push({ producto_id: '', cantidad: 1, precio_unitario: 0 });
     };

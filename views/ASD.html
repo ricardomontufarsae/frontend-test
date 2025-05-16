@@ -1,0 +1,120 @@
+app.controller('ReportInvoiceController', function($scope, $uibModal, FacturaService, UtilService) {
+var vm = this; // Usando controllerAs
+
+// Datos iniciales
+vm.productosFacturados = [];
+vm.ventasPorProducto = { labels: [], data: [] };
+vm.facturasPorMes = { labels: [], data: [] };
+vm.colors = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8']; // Colores Bootstrap
+vm.chartOptions = {
+responsive: true,
+tooltips: {
+callbacks: {
+label: function(tooltipItem, data) {
+const dataset = data.datasets[tooltipItem.datasetIndex];
+const value = dataset.data[tooltipItem.index];
+return '$' + value.toFixed(2);
+}
+}
+}
+};
+
+FacturaService.getProductosFacturados().then(function(response) {
+const facturas = response.data;
+const productosAplanados = [];
+const facturasPorMes = {};
+const ventasPorCategoria = {};
+
+facturas.forEach(function(factura) {
+// Agrupar productos por mes y sumar subtotales
+const mes = new Date(factura.fecha_factura).getMonth();
+
+if (!facturasPorMes[mes]) {
+facturasPorMes[mes] = 0;
+}
+
+factura.productos.forEach(function(prod) {
+// Aplanar productos para la tabla
+productosAplanados.push({
+nombre: prod.nombre,
+numero_factura: factura.numero_factura,
+fecha_factura: factura.fecha_factura,
+precio_total: prod.subtotal
+});
+
+// Sumar al total mensual
+facturasPorMes[mes] += prod.subtotal;
+
+// Sumar al total por categoría
+const categoria = prod.categoria_producto || 'Sin categoría';
+if (!ventasPorCategoria[categoria]) {
+ventasPorCategoria[categoria] = 0;
+}
+ventasPorCategoria[categoria] += prod.subtotal;
+});
+});
+
+const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+// Gráfica: Facturas por Mes
+vm.facturasPorMes = {
+labels: Object.keys(facturasPorMes).map(mes => meses[parseInt(mes)]),
+data: [Object.values(facturasPorMes)]
+};
+
+// Gráfica: Ventas por Categoría
+vm.ventasPorCategoria = {
+labels: Object.keys(ventasPorCategoria),
+data: [Object.values(ventasPorCategoria)]
+};
+
+vm.productosFacturados = productosAplanados;
+});
+
+$scope.verFactura = function(facturaNum) {
+
+FacturaService.getFacturaNumFac(facturaNum).then(function(response) {
+const factura = response.data;
+
+factura.fecha_factura = new Date(factura.fecha_factura);
+
+$uibModal.open({
+backdropClass: 'modal-backdrop-light',
+animation: false,
+size: 'lg',
+backdrop: 'static',
+templateUrl: 'views/modals/modal-factura.html',
+controller: 'ModalFacturaController',
+resolve: {
+factura: function () {
+return factura;
+},
+productosDisponibles: function (ProductoService) {
+return ProductoService.obtenerProductos();
+},
+soloLectura: function () {
+return true;
+}
+}
+});
+}).catch(function(error) {
+console.error('Error al obtener la factura', error);
+});
+};
+
+
+
+$scope.imprimir = function () {
+UtilService.imprimirTabla('tablaReportInvoice', 'Reporte de factura por producto')
+};
+
+$scope.exportarExcel = function () {
+const datos = $scope.productosFacturados.map(p => ({
+Nombre: p.nombre,
+Numero: p.numero_factura,
+Fecha: p.fecha_factura,
+Precio: p.precio_total,
+}));
+UtilService.exportarAExcel(datos, 'Reporte de Facturas', 'Reporte');
+};
+});

@@ -1,4 +1,4 @@
-var app = angular.module('testcrud', ['ngRoute', 'ui.bootstrap']);
+var app = angular.module('testcrud', ['ngRoute', 'ui.bootstrap', 'chart.js']);
 
 app.config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvider) {
 
@@ -49,6 +49,7 @@ app.config(['$routeProvider', '$httpProvider', function($routeProvider, $httpPro
         .when('/reportes/facturas', {
             templateUrl: 'views/reportInvoice.html',
             controller: 'ReportInvoiceController',
+            controllerAs: 'vm',
             resolve: authResolve
         })
         .otherwise({ redirectTo: '/login' });
