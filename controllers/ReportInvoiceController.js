@@ -6,16 +6,21 @@ app.controller('ReportInvoiceController', function($scope, $uibModal, FacturaSer
     vm.facturasPorMes = { labels: [], data: [] };
 
     vm.colorsFacturasPorMes = ['#007bff', '#6f42c1', '#20c997', '#ffc107', '#fd7e14', '#dc3545'];
-    vm.colorsVentasPorCategoria = ['#17a2b8', '#6610f2', '#e83e8c', '#28a745', '#fd7e14', '#343a40'];
+
+    const categoriaColors = [
+        '#4dc9f6', '#f67019', '#f53794', '#537bc4',
+        '#acc236', '#166a8f', '#58595b', '#8c564b',
+        '#ff6384', '#36a2eb', '#ffcd56', '#00a950'
+    ];
 
     vm.chartOptions = {
         responsive: true,
         tooltips: {
             callbacks: {
                 label: function(tooltipItem, data) {
-                    const dataset = data.datasets[tooltipItem.datasetIndex];
-                    const value = dataset.data[tooltipItem.index];
-                    return '$' + value.toFixed(2);
+                    const categoria = data.labels[tooltipItem.index];
+                    const cantidad = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                    return ' ' + categoria + ' - ' + cantidad;
                 }
             }
         }
@@ -25,7 +30,7 @@ app.controller('ReportInvoiceController', function($scope, $uibModal, FacturaSer
         const facturas = response.data;
         const productosAplanados = [];
         const facturasPorMes = {};
-        const ventasPorCategoria = {};
+        const cantidadPorCategoria = {};
 
         facturas.forEach(function(factura) {
             const mes = new Date(factura.fecha_factura).getMonth();
@@ -45,10 +50,10 @@ app.controller('ReportInvoiceController', function($scope, $uibModal, FacturaSer
                 facturasPorMes[mes] += prod.subtotal;
 
                 const categoria = prod.categoria_producto || 'Sin categoría';
-                if (!ventasPorCategoria[categoria]) {
-                    ventasPorCategoria[categoria] = 0;
+                if (!cantidadPorCategoria[categoria]) {
+                    cantidadPorCategoria[categoria] = 0;
                 }
-                ventasPorCategoria[categoria] += prod.subtotal;
+                cantidadPorCategoria[categoria] += prod.cantidad;
             });
         });
 
@@ -60,10 +65,14 @@ app.controller('ReportInvoiceController', function($scope, $uibModal, FacturaSer
             colors: vm.colorsFacturasPorMes
         };
 
-        vm.ventasPorCategoria = {
-            labels: Object.keys(ventasPorCategoria),
-            data: [Object.values(ventasPorCategoria)],
-            colors: vm.colorsVentasPorCategoria
+        const categorias = Object.keys(cantidadPorCategoria);
+        const cantidades = Object.values(cantidadPorCategoria);
+        const colores = categorias.map((_, i) => categoriaColors[i % categoriaColors.length]);
+
+        vm.cantidadPorCategoria = {
+            labels: categorias,
+            data: [cantidades],
+            colors: colores
         };
 
         vm.productosFacturados = productosAplanados;
@@ -99,7 +108,7 @@ app.controller('ReportInvoiceController', function($scope, $uibModal, FacturaSer
     };
 
     $scope.imprimir = function () {
-        UtilService.imprimirTabla('tablaReportInvoice', 'Reporte de factura por producto')
+        UtilService.imprimirTabla('tablaReportInvoice', 'Reporte de factura por producto');
     };
 
     $scope.exportarExcel = function () {
